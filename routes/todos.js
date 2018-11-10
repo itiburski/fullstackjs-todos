@@ -1,9 +1,14 @@
 var express = require('express');
 var router = express.Router();
-var todos = require('../models/todos');
+var Todo = require('../models/todos');
 
 router.get('/', function(req, res) {
-  res.render('todos', {title: 'Todos', todos: todos});
+  Todo.findAsync()
+    .then(function(todos) {
+      res.render('todos', {title: 'Todos', todos: todos});
+    })
+    .catch(console.error)
+    .error(console.error);
 });
 
 module.exports = router;
