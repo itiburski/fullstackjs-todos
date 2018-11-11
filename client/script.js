@@ -2,6 +2,8 @@ var $ = require('jquery');
 var todoTemplate = require('../views/partials/todo.hbs');
 
 $(function() {
+  initTodoObserver();
+
   $(":button").on('click', addTodo);
 
   $('ul').on('change', 'li :checkbox', function() {
@@ -58,6 +60,32 @@ $(function() {
       return false;
     }
   });
+
+  $('.filter').on('click', '.show-all', function() {
+    $('.hide').removeClass('hide');
+  });
+  $('.filter').on('click', '.show-not-done', function() {
+    $('.hide').removeClass('hide');
+    $('.checked').closest('li').addClass('hide');
+  });
+  $('.filter').on('click', '.show-done', function() {
+    $('li').addClass('hide');
+    $('.checked').closest('li').removeClass('hide');
+  });
+
+  $('.clear').on('click', function() {
+    var $doneLi = $('.checked').closest('li');
+    for (var i = 0; i < $doneLi.length; i++) {
+      var $li = $($doneLi[i]); // you get a li out, and still need to convert into $li
+      var id = $li.attr('id');
+      (function($li) {
+        deleteTodo(id, function() {
+          deleteTodoLi($li);
+        });
+      })($li);
+    }
+  });
+
 });
 
 var addTodo = function() {
@@ -106,4 +134,22 @@ var deleteTodo = function(id, cb) {
 
 var deleteTodoLi = function($li) {
   $li.remove();
+}
+
+var initTodoObserver = function() {
+  var target = $('ul')[0];
+  var config = { attribures: true, childList: true, characterData: true };
+  var observer = new MutationObserver(function(mutationRecords) {
+    $.each(mutationRecords, function(index, mutationRecord) {
+      updateTodoCount();
+    });
+  });
+  if (target) {
+    observer.observe(target, config);
+  }
+  updateTodoCount();
+}
+
+var updateTodoCount = function() {
+  $('.count').text($('li').length);
 }
