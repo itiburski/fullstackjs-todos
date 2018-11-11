@@ -55,6 +55,8 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+app.use('/fonts', express.static(path.join(__dirname, 'node_modules/bootstrap-sass/asset/fonts')));
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 app.use('/todos', todosRouter);
